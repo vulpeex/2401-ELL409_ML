@@ -182,3 +182,74 @@ plt.ylabel('Cost')
 plt.legend()
 plt.title('Cost Function Convergence')
 plt.show()
+
+#performance evaluation
+# Function to calculate Mean Squared Error (MSE)
+def mean_squared_error(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
+
+# Predictions and MSE for BGD
+y_pred_bgd = hypothesis(X_val, theta_bgd)
+mse_bgd = mean_squared_error(y_val, y_pred_bgd)
+print(f'MSE on validation data (BGD): {mse_bgd}')
+
+# Predictions and MSE for SGD
+y_pred_sgd = hypothesis(X_val, theta_sgd)
+mse_sgd = mean_squared_error(y_val, y_pred_sgd)
+print(f'MSE on validation data (SGD): {mse_sgd}')
+
+# Plot predictions vs actual data
+plt.figure(figsize=(10,6))
+plt.scatter(X_val[:, 1], y_val, label='Actual data', color='blue')
+plt.plot(X_val[:, 1], y_pred_bgd, label='BGD Predictions', color='red')
+plt.plot(X_val[:, 1], y_pred_sgd, label='SGD Predictions', color='green')
+plt.title('Model Predictions vs Actual Data')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.legend()
+plt.show()
+
+# Function to run SGD with different batch sizes and learning rates
+def test_sgd_with_varied_params(X_train, y_train, theta, learning_rate, num_epochs, batch_size):
+    theta_sgd, cost_history_sgd = stochastic_gradient_descent(X_train, y_train, theta, learning_rate, num_epochs, batch_size)
+    return theta_sgd, cost_history_sgd
+
+# Parameters for experimentation
+batch_sizes = [1, 16, 32, 64, 128]
+learning_rates = [0.1, 0.01, 0.001]
+num_epochs = 1000
+
+# Visualizing the effect of different batch sizes
+plt.figure(figsize=(10, 6))
+for batch_size in batch_sizes:
+    theta_sgd, cost_history_sgd = test_sgd_with_varied_params(X_train, y_train, np.zeros(X_train.shape[1]), 0.01, num_epochs, batch_size)
+    plt.plot(cost_history_sgd, label=f'Batch Size: {batch_size}')
+
+plt.xlabel('Epochs')
+plt.ylabel('Cost')
+plt.title('Effect of Batch Size on SGD Convergence (Learning Rate = 0.01)')
+plt.legend()
+plt.show()
+
+# Visualizing the effect of different learning rates
+plt.figure(figsize=(10, 6))
+for lr in learning_rates:
+    theta_sgd, cost_history_sgd = test_sgd_with_varied_params(X_train, y_train, np.zeros(X_train.shape[1]), lr, num_epochs, 32)
+    plt.plot(cost_history_sgd, label=f'Learning Rate: {lr}')
+
+plt.xlabel('Epochs')
+plt.ylabel('Cost')
+plt.title('Effect of Learning Rate on SGD Convergence (Batch Size = 32)')
+plt.legend()
+plt.show()
+
+# Plot predictions vs actual data for BGD and SGD after tuning
+plt.figure(figsize=(10, 6))
+plt.scatter(X_val[:, 1], y_val, label='Actual data', color='blue', alpha=0.5)
+plt.plot(X_val[:, 1], hypothesis(X_val, theta_bgd), label='BGD Predictions', color='red')
+plt.plot(X_val[:, 1], hypothesis(X_val, theta_sgd), label='SGD Predictions', color='green')
+plt.title('Model Predictions vs Actual Data (After Tuning)')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.legend()
+plt.show()
